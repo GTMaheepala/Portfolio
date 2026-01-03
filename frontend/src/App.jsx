@@ -778,6 +778,50 @@ export default function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    const link = document.querySelector("link[rel~='icon']");
+    const originalHref = link ? link.href : null;
+    const newIcon = '/images/tharuwa.png';
+    const timer = setTimeout(() => {
+      if (link) {
+        link.href = newIcon;
+      } else {
+        const l = document.createElement('link');
+        l.rel = 'icon';
+        l.href = newIcon;
+        document.head.appendChild(l);
+      }
+    }, 800);
+
+    return () => {
+      clearTimeout(timer);
+      if (link && originalHref) link.href = originalHref;
+    };
+  }, []);
+
+  useEffect(() => {
+    const selector = 'section, .work-card, .home-container, .about-img, .skills-container, .services-content, .contact-container, .footer-bg';
+    const elems = Array.from(document.querySelectorAll(selector));
+    elems.forEach((el) => el.classList.add('reveal'));
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+          } else {
+            entry.target.classList.remove('show');
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    elems.forEach((el) => io.observe(el));
+
+    return () => io.disconnect();
+  }, []);
+
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
   };
